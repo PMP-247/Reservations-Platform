@@ -187,8 +187,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-inter text-slate-900">
       <header className="mb-8 max-w-4xl mx-auto">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Resource Reservation</h1>
-        <p className="text-gray-500">Live persistence with Node.js and Supabase.</p>
+        <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Venue Reservations Hub</h1>
+        <p className="text-gray-500">Work smarter.  Worker better. Work here.</p>
       </header>
 
       {StatusAlert}
@@ -197,7 +197,7 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 border-b pb-6 text-slate-700">
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center">
-              <BookOpen className="w-4 h-4 mr-2 text-blue-600" /> Select Resource
+              <BookOpen className="w-4 h-4 mr-2 text-blue-600" /> Select venue options
             </label>
             <select
               value={selectedResourceId}
