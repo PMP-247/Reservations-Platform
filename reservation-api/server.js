@@ -116,4 +116,6 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Frontend served from: ${frontendDistPath}`);
+  console.log("Supabase URL loaded:", !!process.env.SUPABASE_URL);
+  console.log("Supabase Key loaded:", !!process.env.SUPABASE_ANON_KEY);
 });
