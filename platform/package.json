@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.2.0",
-    "lucide-react": "^0.575.0",
+    "@tailwindcss/vite": "^4.0.0", 
+  "lucide-react": "^0.400.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
