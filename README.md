@@ -32,3 +32,8 @@ Book meeting rooms, projectors, or collaboration pods in real-time with live per
 ```bash
 git clone https://github.com/PMP-247/Reservations-Platform.git
 cd Reservations-Platform
+pale.m@Palesas-Laptop reservation-api % ls -R ../platform/dist
+assets          index.html      vite.svg
+
+../platform/dist/assets:
+index-BtCJI00F.js       index-C190nJtv.css

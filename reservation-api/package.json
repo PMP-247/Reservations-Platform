@@ -5,8 +5,10 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install-all": "npm install && cd frontend && npm install",
+  "build": "cd ../platform && npm install && npm run build",
+  "start": "node server.js",
+  "render-postbuild": "npm run install-all && npm run build"
   },
   "keywords": [],
   "author": "",
