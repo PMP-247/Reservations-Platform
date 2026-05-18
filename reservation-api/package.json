@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "install-all": "npm install && cd platform && npm install",
-    "build": "cd ../platform && npm install && npm run build",
+    "build": "npx vite build",
     "start": "node server.js",
     "render-postbuild": "npm run install-all && npm run build"
   },
