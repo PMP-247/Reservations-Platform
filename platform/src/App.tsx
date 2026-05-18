@@ -47,6 +47,7 @@ interface StatusMessage {
 // --- Global Data ---
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://localhost:3001/api';
+//const API_URL = "https://reservations-platform.onrender.com";
 
 const RESOURCES: Resource[] = [
   { id: 'R1', name: 'Meeting Room Alpha', capacity: 10, icon: Users },
