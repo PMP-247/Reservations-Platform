@@ -11,7 +11,7 @@ app.use(express.json());
 //  Production & Development CORS Configuration
 const allowedOrigins = [
   'http://localhost:5173',
-  'reservations-platform-git-main-palesa-ms-projects.vercel.app' // <-- Change this to your live Vercel URL once generated
+  'reservations-platform-dhfq7ukpg-palesa-ms-projects.vercel.app' // <-- Change this to your live Vercel URL once generated
 ];
 
 app.use(cors({
