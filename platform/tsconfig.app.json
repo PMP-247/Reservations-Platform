@@ -24,7 +24,11 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Fix for incremental error */
-    "incremental": true
+    
+    "incremental": true,
+    "types": ["vite/client"]
   },
   "include": ["src"]
 }
+
+  

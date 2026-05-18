@@ -35,5 +35,9 @@ cd Reservations-Platform
 pale.m@Palesas-Laptop reservation-api % ls -R ../platform/dist
 assets          index.html      vite.svg
 
-../platform/dist/assets:
-index-BtCJI00F.js       index-C190nJtv.css
+Please use:
+Backend use node server.js 
+Frontend npm run dev
+or npm start
+
+Backend Express: 3001 (default, from server.js)

@@ -1,121 +1,94 @@
-import dotenv from "dotenv";
+import express from 'express';
+import cors from 'cors';
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-import express from "express";
-import path from 'path';
-import cors from "cors";
-import { fileURLToPath } from 'url';
-import { supabase } from "./lib/supabaseClient.js";
-
 const app = express();
+app.use(express.json());
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// This matches your folder name "platform" and its build output "dist"
-const frontendDistPath = path.resolve(__dirname, '..', 'platform', 'dist');
-
-// --- Middleware ---
-app.use(cors());
-app.use(express.json()); 
-app.use(express.static(frontendDistPath)); 
-
-app.use((req, _res, next) => {
-  console.log(`➡️  ${req.method} ${req.originalUrl}`);
-  next();
-});
-
-// --- API Routes ---
-app.get("/api/ping", (_req, res) => res.json({ message: "pong" }));
-
-const ALL_TIME_SLOTS = [
-  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-  '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-  '16:00', '16:30', '17:00'
+//  Production & Development CORS Configuration
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://your-frontend-project.vercel.app' // <-- Change this to your live Vercel URL once generated
 ];
 
-app.get("/api/slots", async (req, res) => {
-  const { date, resourceId } = req.query;
-  try {
-    const { data: bookings, error } = await supabase
-      .from('bookings')
-      .select('slot')
-      .eq('date', date)
-      .eq('resourceId', resourceId);
+app.use(cors({
+  origin: function (origin, callback) {
+   
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
-    if (error) throw error;
-    const bookedSlots = bookings.map(b => b.slot);
-    const availableSlots = ALL_TIME_SLOTS.filter(slot => !bookedSlots.includes(slot));
-    res.json({ availableSlots });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// Initialized Supabase Client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Root healthcheck endpoint for Render's z validation checks
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'healthy', service: 'Venue Booking API' });
 });
 
-app.get("/api/bookings/:date/:resource", async (req, res) => {
-  const { date, resource } = req.params;
+// 1. GET Bookings for a  date and room
+app.get('/api/bookings/:date/:room', async (req, res) => {
+  const { date, room } = req.params;
   try {
-    const { data: bookings, error } = await supabase
+    const { data, error } = await supabase
       .from('bookings')
       .select('*')
       .eq('date', date)
-      .eq('resourceId', resource);
+      .eq('resourceId', room);
+
     if (error) throw error;
-    res.json({ bookings });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json({ bookings: data || [] });
+  } catch (error) {
+    console.error("GET Error:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
-app.post("/api/bookings", async (req, res) => {
+// 2. POST a new reservation
+app.post('/api/bookings', async (req, res) => {
   const { resourceId, date, slot, user } = req.body;
   try {
-    const { data: existing, error: fetchError } = await supabase
-      .from('bookings')
-      .select('id')
-      .eq('resourceId', resourceId)
-      .eq('date', date)
-      .eq('slot', slot)
-      .maybeSingle();
-
-    if (fetchError) throw fetchError;
-    if (existing) return res.status(409).json({ error: "This slot is already taken." });
-
-    const { data: newBooking, error: insertError } = await supabase
+    const { data, error } = await supabase
       .from('bookings')
       .insert([{ resourceId, date, slot, user }])
-      .select()
-      .single();
+      .select();
 
-    if (insertError) throw insertError;
-    res.status(201).json({ message: "Reservation confirmed!", booking: newBooking });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (error) throw error;
+    res.status(201).json({ message: 'Booking successful!', booking: data[0] });
+  } catch (error) {
+    console.error("POST Error:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
-app.delete("/api/bookings/:id", async (req, res) => {
+// 3. DELETE a reservation
+app.delete('/api/bookings/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const { error } = await supabase.from('bookings').delete().eq('id', id);
+    const { error } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', id);
+
     if (error) throw error;
-    res.json({ success: true, message: "Booking deleted." });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json({ message: 'Booking cancelled successfully.' });
+  } catch (error) {
+    console.error("DELETE Error:", error); 
+    res.status(500).json({ error: error.message });
   }
 });
 
-// --- Serve React Frontend ---
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendDistPath, 'index.html'));
-});
-
-// --- Start Server ---
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Frontend served from: ${frontendDistPath}`);
-  console.log("Supabase URL loaded:", !!process.env.SUPABASE_URL);
-  console.log("Supabase Key loaded:", !!process.env.SUPABASE_ANON_KEY);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
